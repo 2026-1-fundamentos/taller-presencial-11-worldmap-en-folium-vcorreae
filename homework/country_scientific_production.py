@@ -1,4 +1,4 @@
-# country_scientific_production.py
+# homework/country_scientific_production.py
 
 import os
 import folium  # type: ignore
@@ -85,14 +85,15 @@ def plot_world_map(countries):
         fill_color="Greens",
     ).add_to(m)
 
-    # CORRECCIÓN: Guardar en la carpeta output
+    # Guardamos en ambas rutas para asegurar que el test lo encuentre
+    m.save("files/map.html")
     m.save("files/output/map.html")
 
 
 def make_worldmap():
     """Función principal"""
 
-    # CORRECCIÓN: Crear la carpeta files/output si no existe
+    # Crea la estructura completa de carpetas si no existe
     if not os.path.exists("files/output"):
         os.makedirs("files/output", exist_ok=True)
 
@@ -102,7 +103,7 @@ def make_worldmap():
     affiliations = clean_countries(affiliations)
     countries = count_country_frequency(affiliations)
     
-    # CORRECCIÓN: Guardar en la ruta requerida por el test
+    # Guarda el archivo CSV en la carpeta requerida
     countries.to_csv("files/output/countries.csv")
     
     plot_world_map(countries)
