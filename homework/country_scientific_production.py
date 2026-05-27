@@ -1,7 +1,6 @@
-# country_scientific_production.py
+# country_scientific_production.py
 
 import os
-
 import folium  # type: ignore
 import pandas as pd  # type: ignore
 
@@ -49,7 +48,6 @@ def add_countries_column(affiliations):
 
 
 def clean_countries(affiliations):
-
     affiliations = affiliations.copy()
     affiliations["countries"] = affiliations["countries"].str.replace(
         "United States", "United States of America"
@@ -87,21 +85,26 @@ def plot_world_map(countries):
         fill_color="Greens",
     ).add_to(m)
 
-    m.save("files/map.html")
+    # CORRECCIÓN: Guardar en la carpeta output
+    m.save("files/output/map.html")
 
 
 def make_worldmap():
     """Función principal"""
 
-    if not os.path.exists("files"):
-        os.makedirs("files")
+    # CORRECCIÓN: Crear la carpeta files/output si no existe
+    if not os.path.exists("files/output"):
+        os.makedirs("files/output", exist_ok=True)
 
     affiliations = load_affiliations()
     affiliations = remove_na_rows(affiliations)
     affiliations = add_countries_column(affiliations)
     affiliations = clean_countries(affiliations)
     countries = count_country_frequency(affiliations)
-    countries.to_csv("files/countries.csv")
+    
+    # CORRECCIÓN: Guardar en la ruta requerida por el test
+    countries.to_csv("files/output/countries.csv")
+    
     plot_world_map(countries)
 
 
