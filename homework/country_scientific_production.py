@@ -1,4 +1,4 @@
-# homework/country_scientific_production.py
+# country_scientific_production.py
 
 import os
 import folium  # type: ignore
@@ -49,4 +49,64 @@ def add_countries_column(affiliations):
 
 def clean_countries(affiliations):
     affiliations = affiliations.copy()
-    affiliations["countries"] = affiliations
+    affiliations["countries"] = affiliations["countries"].str.replace(
+        "United States", "United States of America"
+    )
+    return affiliations
+
+
+def count_country_frequency(affiliations):
+    """Cuenta la frecuencia de cada país en la columna 'countries'"""
+
+    countries = affiliations["countries"].copy()
+    countries = countries.str.split(", ")
+    countries = countries.explode()
+    countries = countries.value_counts()
+    return countries
+
+
+def plot_world_map(countries):
+    """Grafica un mapa mundial con la frecuencia de cada país."""
+
+    countries = countries.copy()
+    countries = countries.to_frame()
+    countries = countries.reset_index()
+
+    m = folium.Map(location=[0, 0], zoom_start=2)
+
+    folium.Choropleth(
+        geo_data=(
+            "https://raw.githubusercontent.com/python-visualization/"
+            "folium/master/examples/data/world-countries.json"
+        ),
+        data=countries,
+        columns=["countries", "count"],
+        key_on="feature.properties.name",
+        fill_color="Greens",
+    ).add_to(m)
+
+    # CORRECCIÓN: Guardar en la carpeta output
+    m.save("files/output/map.html")
+
+
+def make_worldmap():
+    """Función principal"""
+
+    # CORRECCIÓN: Crear la carpeta files/output si no existe
+    if not os.path.exists("files/output"):
+        os.makedirs("files/output", exist_ok=True)
+
+    affiliations = load_affiliations()
+    affiliations = remove_na_rows(affiliations)
+    affiliations = add_countries_column(affiliations)
+    affiliations = clean_countries(affiliations)
+    countries = count_country_frequency(affiliations)
+    
+    # CORRECCIÓN: Guardar en la ruta requerida por el test
+    countries.to_csv("files/output/countries.csv")
+    
+    plot_world_map(countries)
+
+
+if __name__ == "__main__":
+    make_worldmap()
